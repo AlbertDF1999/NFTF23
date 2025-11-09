@@ -4,9 +4,9 @@ pragma solidity ^0.8.18;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {console} from "forge-std/Test.sol";
 
 contract MoodNFT is ERC721 {
-
     //ERRORS
 
     error MoodNFT_CantFlipMoodIfNotOwner();
@@ -37,16 +37,16 @@ contract MoodNFT is ERC721 {
         s_tokenCounter++;
     }
 
-    function flipMood(unit256 tokenId) public {
+    function flipMood(uint256 tokenId) public {
         //only want the NFT owner to be able to change the mood
-        if (!_isApprovedOrOwner(msg.sender, tokenId)) {
+        if (!_isAuthorized(msg.sender, msg.sender, tokenId)) {
             revert MoodNFT_CantFlipMoodIfNotOwner();
         }
 
-        if(s_tokenIdToMood[tokenId] == Mood.HAPPY) {
-            s_tokenIdToMood[tokenId] == Mood.SAD
+        if (s_tokenIdToMood[tokenId] == Mood.HAPPY) {
+            s_tokenIdToMood[tokenId] = Mood.SAD;
         } else {
-            s_tokenIdToMood[tokenId] == Mood.HAPPY
+            s_tokenIdToMood[tokenId] = Mood.HAPPY;
         }
     }
 
@@ -79,5 +79,17 @@ contract MoodNFT is ERC721 {
                     )
                 )
             );
+    }
+
+    function getSadSvgImageUri() public view returns (string memory) {
+        return s_sadSvgImageUri;
+    }
+
+    function getHappySvgImageUri() public view returns (string memory) {
+        return s_happySvgImageUri;
+    }
+
+    function getMood(uint256 tokenId) public view returns (Mood) {
+        return s_tokenIdToMood[tokenId];
     }
 }
